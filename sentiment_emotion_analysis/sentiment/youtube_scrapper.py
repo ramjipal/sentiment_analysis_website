@@ -1,10 +1,6 @@
-from tweepy import OAuthHandler
-from tweepy import API
-from tweepy import Cursor
 from datetime import datetime, date, time, timedelta
 from collections import Counter
 import sys
-import tweepy
 import numpy as np
 import pandas as pd
 import re
@@ -19,7 +15,7 @@ youtube = googleapiclient.discovery.build(
 api_service_name, api_version, developerKey=DEVELOPER_KEY)
 
 
-def get_tweets(id):
+def get_comments(id):
     request = youtube.commentThreads().list(
         part="snippet",
         videoId=id,
@@ -40,15 +36,12 @@ def get_tweets(id):
     # df = df.loc[df['author']!=author_name]
     comment_list = list(df['text'])
     question_list = []
-    another_list = []
+    clean_comment_list = []
     pattern = r"&#\d+;?;"
     for comment in comment_list:
         comment = re.sub(pattern, "", comment)
-        if "?" in comment:
-            question_list.append(comment)
-        else:
-            another_list.append(comment)
-    return another_list
+        clean_comment_list.append(comment)
+    return clean_comment_list
 
 
 	

@@ -1,0 +1,20 @@
+#facebook {
+     float: left;
+     background: Red;
+     width: 25%;
+     height: 280px;
+ }
+
+ #reddit {
+     float: left;
+     background: Green;
+     width: 50%;
+     height: 280px;
+ }
+
+ #youtube {
+     float: right;
+     background: blue;
+     width: 25%;
+     height: 280px;
+ }

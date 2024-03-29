@@ -44,10 +44,10 @@ class sentiment_analysis_code():
                     else:
                         return txt
 
-    def get_tweet_sentiment(self, tweet):
-        #cleaning of tweet
-            tweet = ' '.join(self.cleaning(tweet))
-            analysis = TextBlob(tweet)
+    def get_comment_sentiment(self, tweet):
+        #cleaning of comment
+            comment = ' '.join(self.cleaning(tweet))
+            analysis = TextBlob(comment)
             if analysis.sentiment.polarity > 0:
                 return 'Positive'
             elif analysis.sentiment.polarity == 0:

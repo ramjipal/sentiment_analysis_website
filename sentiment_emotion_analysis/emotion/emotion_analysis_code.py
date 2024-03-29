@@ -8,7 +8,6 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from django.conf import settings
 import os
 
-# tweet = 'Layin n bed with a headache  ughhhh...waitin on your call...'
 
 class emotion_analysis_code():
 
@@ -48,7 +47,7 @@ class emotion_analysis_code():
                     else:
                         return txt
 
-    def predict_emotion(self, tweet):
+    def get_comment_emotion(self, tweet):
 
         tweet_in_pandas = pd.Series(' '.join(self.cleaning(tweet)))
 
@@ -63,9 +62,6 @@ class emotion_analysis_code():
         # filename = 'finalized_model.sav'
         model = pickle.load(open(path_model, 'rb'))
 
-
-
-
         test = vectorizer.transform(tweet_in_pandas)
         predicted_sentiment = model.predict(test)
         final_sentiment = (predicted_sentiment[0])
@@ -79,3 +75,9 @@ class emotion_analysis_code():
             return 'Love'
         elif final_sentiment == 'hate':
             return 'Hate'
+        
+        
+if __name__== "__main__":
+    analysis = emotion_analysis_code()
+    emot = analysis.get_comment_emotion("i love you")
+    print(emot)

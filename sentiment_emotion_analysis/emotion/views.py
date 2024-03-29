@@ -1,52 +1,81 @@
 from django.shortcuts import render, redirect, HttpResponse
-from .forms import Emotion_Typed_Tweet_analyse_form
 from .emotion_analysis_code import emotion_analysis_code
-from .forms import Emotion_Imported_Tweet_analyse_form
-from .tweepy_emotion import Import_tweet_emotion
+from . import youtube_scrapper, reddit_scrapper, facebook_scrapper
 
-def emotion_analysis(request):
-    return render(request, 'home/emotion.html')
+
+def social_selection(request):
+    print("____________*********************___________________________")
+    
+    return render(request, 'emotion_home/social_selection.html')
+
+def youtube_emotion_analysis(request):
+    return render(request, 'emotion_home/youtube/emotion.html')
+
+def reddit_emotion_analysis(request):
+    return render(request, 'emotion_home/reddit/emotion.html')
+
+def facebook_emotion_analysis(request):
+    return render(request, 'emotion_home/facebook/emotion.html')
 
 def emotion_analysis_type(request):
     if request.method == 'POST':
-        form = Emotion_Typed_Tweet_analyse_form(request.POST)
+        form = request.POST
         analyse = emotion_analysis_code()
-        if form.is_valid():
-            tweet = form.cleaned_data['emotion_typed_tweet']
-            emotion = analyse.predict_emotion(tweet)
-            args = {'tweet':tweet, 'emotion':emotion}
-            return render(request, 'home/emotion_type_result.html', args)
+        comment = form.get('emotion_typed_comment')
+        emotion = analyse.get_comment_emotion(comment)
+        args = {'comment':comment, 'emotion':emotion}
+        return render(request, 'emotion_home/emotion_type_result.html', args)
 
     else:
-        form = Emotion_Typed_Tweet_analyse_form()
-        return render(request, 'home/emotion_type.html')
+        return render(request, 'emotion_home/emotion_type.html')
 
 def emotion_analysis_import(request):
     if request.method == 'POST':
-        form = Emotion_Imported_Tweet_analyse_form(request.POST)
-        tweet_text = Import_tweet_emotion()
-        analyse = emotion_analysis_code()
-
-        if form.is_valid():
-            handle = form.cleaned_data['emotion_imported_tweet']
-
-            if handle[0]=='#':
-                list_of_tweets = tweet_text.get_hashtag(handle)
-                list_of_tweets_and_emotions = []
-                for i in list_of_tweets:
-                    list_of_tweets_and_emotions.append((i,analyse.predict_emotion(i)))
-                args = {'list_of_tweets_and_emotions':list_of_tweets_and_emotions, 'handle':handle}
-                return render(request, 'home/emotion_import_result_hashtag.html', args)
-
-            list_of_tweets = tweet_text.get_tweets(handle)
-            list_of_tweets_and_emotions = []
-            if handle[0] != '@':
-                handle = str('@' + handle)
-            for i in list_of_tweets:
-                list_of_tweets_and_emotions.append((i, analyse.predict_emotion(i)))
-            args = {'list_of_tweets_and_emotions': list_of_tweets_and_emotions, 'handle': handle}
-            return render(request, 'home/emotion_import_result.html', args)
+        form = request.POST
+        analyse = emotion_analysis_code()  # a class for emotion analysis
+        video_url = form['emotion_imported_comment']
+        id  = video_url[-11:]
+        list_of_comments = youtube_scrapper.get_comments(id)
+        list_of_comments_and_emotions = []
+        for i in list_of_comments:
+            list_of_comments_and_emotions.append((i,analyse.get_comment_emotion(i)))
+            args = {'list_of_comments_and_emotions': list_of_comments_and_emotions, 'handle': id}
+            return render(request, 'emotion_home/youtube/emotion_import_result.html', args)
 
     else:
-        form = Emotion_Imported_Tweet_analyse_form()
-        return render(request, 'home/emotion_import.html')
+        return render(request, 'emotion_home/youtube/emotion_import.html')
+    
+    
+def reddit_emotion_analysis_import(request):
+    if request.method == 'POST':
+        form = request.POST
+        analyse = emotion_analysis_code()  # a class for emotion analysis
+        post_url = form['reddit_emotion_imported_comment']
+        post_url = str(post_url)
+        list_of_comments = reddit_scrapper.get_comments(post_url)
+        list_of_comments_and_emotions = []
+        for i in list_of_comments:
+            list_of_comments_and_emotions.append((i,analyse.get_comment_emotion(i)))
+            
+        args = {'list_of_comments_and_emotions':list_of_comments_and_emotions, 'handle':post_url}
+        return render(request, 'emotion_home/reddit/emotion_import_result.html', args)
+
+    else:
+        return render(request, 'emotion_home/reddit/emotion_import.html')
+    
+def facebook_emotion_analysis_import(request):
+    if request.method == 'POST':
+        form = request.POST
+        analyse = emotion_analysis_code()  # a class for emotion analysis
+        post_url = form.get('facebook_emotion_imported_comment')
+        post_url = str(post_url)
+        list_of_comments = facebook_scrapper.get_comments(post_url)
+        list_of_comments_and_emotions = []
+        for i in list_of_comments:
+            list_of_comments_and_emotions.append((i,analyse.get_comment_emotion(i)))
+            
+        args = {'list_of_comments_and_emotions':list_of_comments_and_emotions, 'handle':post_url}
+        return render(request, 'emotion_home/facebook/emotion_import_result.html', args)
+
+    else:
+        return render(request, 'emotion_home/facebook/emotion_import.html')
