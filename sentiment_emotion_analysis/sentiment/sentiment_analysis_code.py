@@ -1,13 +1,18 @@
+from django.conf import settings
+import os
 import re
 from textblob import TextBlob
 from nltk.stem.wordnet import WordNetLemmatizer 
 import itertools
 import numpy as np
 import nltk
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from deep_translator import GoogleTranslator
+import pickle
 
-
+MODELS = os.path.join(settings.BASE_DIR, 'sentiment/models')
 class sentiment_analysis_code():
-
+    
     lem = WordNetLemmatizer()
 
     def cleaning(self, text):
@@ -17,11 +22,6 @@ class sentiment_analysis_code():
             return 'no text'
         else:
             txt = txt.split()
-            index = 0
-            for j in range(len(txt)):
-                if txt[j][0] == '@':
-                    index = j
-            txt = np.delete(txt, index)
             if len(txt) == 0:
                 return 'no text'
             else:
@@ -44,13 +44,36 @@ class sentiment_analysis_code():
                     else:
                         return txt
 
-    def get_comment_sentiment(self, tweet):
+    def get_comment_sentiment(self, comment):
+            translator= GoogleTranslator(source='auto', target='en')
         #cleaning of comment
-            comment = ' '.join(self.cleaning(tweet))
-            analysis = TextBlob(comment)
-            if analysis.sentiment.polarity > 0:
-                return 'Positive'
-            elif analysis.sentiment.polarity == 0:
-                return 'Neutral'
-            else:
+            # comment = ' '.join(self.cleaning(comment))
+            comment = translator.translate(comment)
+            analyzer = SentimentIntensityAnalyzer()
+            vs = analyzer.polarity_scores(comment)
+            print("-------------------------------------------")
+            print(vs['compound'])
+            if vs['compound'] < 0:
                 return 'Negative'
+            elif vs['compound'] > 0.48:
+                return 'Positive'
+            else:
+                return 'Neutral'
+    
+class QuestinClassifier():
+    def __init__(self):
+        with open(MODELS+'/query_classifier.pickle', 'rb') as file:
+            self.model = pickle.load(file)
+
+        with open(MODELS+'/question_vectorizer.pickle', 'rb') as file:
+            self.vectorizer = pickle.load(file)
+    
+    def isquestion(self, comment):
+        vectorized_text = self.vectorizer.transform([comment])
+        predict = self.model.predict(vectorized_text)
+        return (predict[0])
+        
+        
+if __name__ == "__main__":
+    qclass = QuestinClassifier()
+        

@@ -56,7 +56,7 @@
         <div class="collapse navbar-collapse" id="ftco-nav">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item"><a href="/sentiment" class="nav-link">Sentiment Analysis</a></li>
-            <li class="nav-item"><a href="/emotion" class="nav-link">Emotion Analysis</a></li>
+            
           </ul>
         </div>
       </div>
@@ -89,7 +89,7 @@
   <div class="tbl-content" data-aos="fade-up"  data-aos-delay="700">
     <table cellpadding="0" cellspacing="0" border="0">
       <tbody>
-      	{% for i,j in list_of_tweets_and_sentiments %}
+      	{% for i,j in list_of_comments_and_sentiments %}
         <tr>
           <td>{{i}}</td>
           <td>{{j}}</td>

@@ -2,8 +2,8 @@ import praw
 import re
 user_agent = "Scrapper 1.0 by /u/python.engineer"
 reddit = praw.Reddit(
-    client_id = "NzMwgxynLakfNDyvekRBQw",
-    client_secret = "9CHrOvuz2i5ROV2SkWqOHpv4oqleZg",
+    client_id = "9Gf7qp5gGGuFwija9oeL5A",
+    client_secret = "XhNXA-JKnXNsPaZZdnIkuV_8bDec9Q",
     user_agent = user_agent
 )
 
