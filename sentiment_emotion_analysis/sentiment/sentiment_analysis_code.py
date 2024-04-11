@@ -45,10 +45,10 @@ class sentiment_analysis_code():
                         return txt
 
     def get_comment_sentiment(self, comment):
+            comment = ' '.join(self.cleaning(comment))
             translator= GoogleTranslator(source='auto', target='en')
+            comment = str(translator.translate(comment))
         #cleaning of comment
-            # comment = ' '.join(self.cleaning(comment))
-            comment = translator.translate(comment)
             analyzer = SentimentIntensityAnalyzer()
             vs = analyzer.polarity_scores(comment)
             print("-------------------------------------------")
